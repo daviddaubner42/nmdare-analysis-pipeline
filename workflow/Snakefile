@@ -1,0 +1,234 @@
+import os
+
+configfile: "config/config.yaml"
+report: "workflow.rst"
+
+rawdir = config["datadir"] # the directory with derivatives to be analysed
+outdir = config["outdir"] # the directory where results are to be stored
+
+environmentdir = os.path.join(config["rootdir"], "envs")
+resourcedir = os.path.join(config["rootdir"], "resources")
+workflowdir = os.path.join(config["rootdir"], "workflow")
+
+# Create the results directory if it doesn't exist already
+os.makedirs(outdir, exist_ok=True)
+
+# Specifies the files which should exist at the end of the processing
+endfiles = [
+    os.path.join(outdir, "results", "static", "images", "avg_fc_comparison.png"),
+    os.path.join(outdir, "results", "static", "images", "p_vals_uncorrected.png"),
+    os.path.join(outdir, "results", "static", "images", "p_vals_fdr.png")
+]
+
+# Define the subject IDs to be processed
+excluded = config["excluded_participants"]
+subids = [subid[4:] for subid in os.listdir(os.path.join(rawdir, "xcp_d")) if os.path.exists(os.path.join(rawdir, "xcp_d", f"{subid}", "func", f"{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_stat-pearsoncorrelation_boldmap.pconn.nii")) and subid[4:] not in excluded]
+
+rule all:
+    """
+    Generates all required outputs
+    """
+    input:
+        expand(endfiles, subid=subids)
+
+""" ------------------------------------------- """
+""" ---------------- The rules ---------------- """
+""" ------------------------------------------- """
+
+# Prep
+
+rule get_neat_demo_data:
+    input: 
+        os.path.join(resourcedir, "demographics.xlsx")
+    params:
+        workflowdir = workflowdir,
+        outdir = outdir
+    output: 
+        os.path.join(outdir, "intermediaries", "demo_data.csv")
+    conda:
+        os.path.join(environmentdir, "environment.yaml")
+    shell:
+        "mkdir -p {params.outdir}/intermediaries && " 
+        "python {params.workflowdir}/scripts/get_neat_demo_data.py --input_file {input} --output_file {output}"
+
+rule create_networks:
+    input:
+        os.path.join(resourcedir, "atlas-DesikanKilliany_dseg.tsv")
+    params:
+        resourcedir = resourcedir,
+        workflowdir = workflowdir,
+        outdir = outdir
+    output:
+        os.path.join(outdir, "intermediaries", "networks", "networks.pkl"),
+        os.path.join(outdir, "intermediaries", "networks", "network_names.pkl"),
+        os.path.join(outdir, "intermediaries", "networks", "partition.pkl"),
+        os.path.join(outdir, "intermediaries", "networks", "to_delete_network.pkl"),
+        os.path.join(outdir, "intermediaries", "networks", "to_delete_partition.pkl"),
+        os.path.join(outdir, "intermediaries", "networks", "network_labels.pkl"),
+        os.path.join(outdir, "intermediaries", "networks", "partition_labels.pkl")
+    conda:
+        os.path.join(environmentdir, "environment.yaml")
+    shell:
+        "python {params.workflowdir}/scripts/create_networks.py --seg_file {input} --out_dir {params.outdir}/intermediaries/networks"
+
+rule create_raw_fc:
+    input:
+        exc=os.path.join(outdir, "intermediaries", "networks", "to_delete_network.pkl"),
+        ts=os.path.join(rawdir, "xcp_d", "sub-{subid}", "func", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_stat-mean_timeseries.ptseries.nii")
+    params:
+        workflowdir = workflowdir,
+        outdir = outdir
+    output:
+        os.path.join(outdir, "results", "static", "sub-{subid}", "sub-{subid}_FC_raw.csv")
+    conda:
+        os.path.join(environmentdir, "environment.yaml")
+    shell:
+        "mkdir -p {params.outdir}/results/static/sub-{wildcards.subid} && "
+        "python {params.workflowdir}/scripts/create_raw_fc.py --ts_path {input.ts} --excluded_rois_path {input.exc} --out_path {output}"
+
+rule regress_confounds:
+    input:
+        expand(os.path.join(outdir, "results", "static", "sub-{subid}", "sub-{subid}_FC_raw.csv"), subid=subids),
+        demo=os.path.join(outdir, "intermediaries", "demo_data.csv")
+    params:
+        workflowdir = workflowdir,
+        outdir = outdir,
+        fcdir = os.path.join(outdir, "results", "static"),
+        subids=subids
+    output:
+        expand(os.path.join(outdir, "results", "static", "sub-{subid}", "sub-{subid}_FC_regr.csv"), subid=subids)
+    conda:
+        os.path.join(environmentdir, "environment.yaml")
+    shell:
+        "python {params.workflowdir}/scripts/regress_confounds.py --fc_dir {params.fcdir} --subids {params.subids} --demo_data_path {input.demo}"
+
+rule pairwise_comparison:
+    input:
+        expand(os.path.join(outdir, "results", "static", "sub-{subid}", "sub-{subid}_FC_regr.csv"), subid=subids),
+        demo=os.path.join(outdir, "intermediaries", "demo_data.csv")
+    params:
+        workflowdir = workflowdir,
+        outdir = outdir,
+        fcdir = os.path.join(outdir, "results", "static"),
+        subids=subids
+    output:
+        os.path.join(outdir, "results", "static", "p_vals.csv"),
+        os.path.join(outdir, "results", "static", "p_vals_fdr.csv"),
+        os.path.join(outdir, "results", "static", "stats.csv")
+    conda:
+        os.path.join(environmentdir, "environment.yaml")
+    shell:
+        "python {params.workflowdir}/scripts/pairwise_comparison.py --fc_dir {params.fcdir} --subids {params.subids} --demo_data_path {input.demo}"
+
+rule plot_pairwise_comparison:
+    input:
+        os.path.join(outdir, "results", "static", "p_vals.csv"),
+        os.path.join(outdir, "results", "static", "p_vals_fdr.csv"),
+        os.path.join(outdir, "results", "static", "stats.csv"),
+        os.path.join(outdir, "intermediaries", "networks", "networks.pkl"),
+        os.path.join(outdir, "intermediaries", "networks", "network_names.pkl"),
+        expand(os.path.join(outdir, "results", "static", "sub-{subid}", "sub-{subid}_FC_regr.csv"), subid=subids),
+        demo=os.path.join(outdir, "intermediaries", "demo_data.csv"),
+    params:
+        workflowdir = workflowdir,
+        outdir = outdir,
+        fcdir = os.path.join(outdir, "results", "static"),
+        subids=subids,
+        networkdir = os.path.join(outdir, "intermediaries", "networks")
+    output:
+        os.path.join(outdir, "results", "static", "images", "avg_fc_comparison.png"),
+        os.path.join(outdir, "results", "static", "images", "p_vals_uncorrected.png"),
+        os.path.join(outdir, "results", "static", "images", "p_vals_fdr.png")
+    conda:
+        os.path.join(environmentdir, "environment.yaml")
+    shell:
+        "python {params.workflowdir}/scripts/plot_pairwise_comparison.py --fc_dir {params.fcdir} --subids {params.subids} --demo_data_path {input.demo} --network_dir {params.networkdir}"
+
+""" ------------------------------------------- """
+""" ------- Dynamic FC analysis rules --------- """
+""" ------------------------------------------- """
+
+rule create_windowed_fcs:
+    input:
+        exc=os.path.join(outdir, "intermediaries", "networks", "to_delete_network.pkl"),
+        ts=os.path.join(rawdir, "xcp_d", "sub-{subid}", "func", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_stat-mean_timeseries.ptseries.nii")
+    params:
+        workflowdir = workflowdir,
+        outdir = outdir
+    output:
+        os.path.join(outdir, "results", "dynamic", "sub-{subid}", "sub-{subid}_windowed_FCs.pkl")
+    conda:
+        os.path.join(environmentdir, "environment.yaml")
+    shell:
+        "mkdir -p {params.outdir}/results/dynamic/sub-{wildcards.subid} && "
+        "python {params.workflowdir}/scripts/create_windowed_fcs.py --ts_path {input.ts} --excluded_rois_path {input.exc} --out_path {output} --window_size 30 --step_size 1"
+
+rule regress_windowed_fcs:
+    input:
+        expand(os.path.join(outdir, "results", "dynamic", "sub-{subid}", "sub-{subid}_windowed_FCs.pkl"), subid=subids),
+        demo=os.path.join(outdir, "intermediaries", "demo_data.csv")
+    params:
+        workflowdir = workflowdir,
+        outdir = outdir,
+        fcdir = os.path.join(outdir, "results", "dynamic"),
+        subids=subids
+    output:
+        expand(os.path.join(outdir, "results", "dynamic", "sub-{subid}", "sub-{subid}_windowed_FCs_regr.csv"), subid=subids)
+    conda:
+        os.path.join(environmentdir, "environment.yaml")
+    shell:
+        "python {params.workflowdir}/scripts/regress_windowed_confounds.py --fc_dir {params.fcdir} --subids {params.subids} --demo_data_path {input.demo}"
+
+rule create_FCDs:
+    input:
+        os.path.join(outdir, "results", "dynamic", "sub-{subid}", "sub-{subid}_windowed_FCs_regr.csv")
+    params:
+        workflowdir = workflowdir,
+        outdir = outdir,
+        fcdir = os.path.join(outdir, "results", "dynamic"),
+        subids=subids
+    output:
+        os.path.join(outdir, "results", "dynamic", "sub-{subid}", "sub-{subid}_FCD.csv"),
+        os.path.join(outdir, "results", "dynamic", "sub-{subid}", "sub-{subid}_FCD_hist.pkl")
+    conda:
+        os.path.join(environmentdir, "environment.yaml")
+    shell:
+        "python {params.workflowdir}/scripts/create_FCDs.py --windowed_fc_path {input} --out_dir {params.outdir}/results/dynamic/sub-{wildcards.subid} --subid {wildcards.subid}"
+
+rule plot_FCDs:
+    input:
+        os.path.join(outdir, "results", "intermediaries", "demo_data.csv"),
+        os.path.join(outdir, "results", "dynamic", "sub-{subid}", "sub-{subid}_FCD.csv"),
+        os.path.join(outdir, "results", "dynamic", "sub-{subid}", "sub-{subid}_FCD_hist.pkl")
+    params:
+        workflowdir = workflowdir,
+        outdir = outdir,
+        subids=subids
+    output:
+        os.path.join(outdir, "results", "dynamic", "images", "avg_FCD_comparison.png"),
+        os.path.join(outdir, "results", "dynamic", "images", "avg_FCD_hist_comparison.png")
+    conda:
+        os.path.join(environmentdir, "environment.yaml")
+    shell:
+        "mkdir -p {params.outdir}/results/dynamic/images && "
+        "python {params.workflowdir}/scripts/plot_FCDs.py --fcds_path {params.outdir}/results/dynamic/ --subids {params.subids} --demo_data_path {input[0]}"
+
+""" ------------------------------------------- """
+""" ------ Graph theory analysis rules -------- """
+""" ------------------------------------------- """
+
+rule calculate_global_metrics:
+    input:
+        os.path.join(outdir, "results", "static", "sub-{subid}", "sub-{subid}_FC_regr.csv"),
+        os.path.join(outdir, "intermediaries", "demo_data.csv")
+    params:
+        workflowdir = workflowdir,
+        outdir = outdir,
+        subids=subids
+    output:
+        os.path.join(outdir, "results", "graph_theory", "global_metrics.csv")
+    conda:
+        os.path.join(environmentdir, "environment.yaml")
+    shell:
+        "mkdir -p {params.outdir}/results/graph_theory && "
+        "python {params.workflowdir}/scripts/calculate_global_metrics.py --fc_path {input} --out_path {output} --demo_data_path {input[1]} --subids {params.subids}"

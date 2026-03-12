@@ -1,0 +1,11 @@
+datadir:  "/Users/brainsimulation/Desktop/derivatives_dk_T2uniform/derivatives"
+rootdir: "/Users/brainsimulation/Desktop/nmdare-analysis/"
+outdir: "/Users/brainsimulation/Desktop/nmdare-analysis/out"
+
+excluded_participants:
+  - RSGK017
+  - LENMDA001
+  - LENMDA006
+  - LENMDA172
+  - LENMDA187
+  - LENMDA191
