@@ -9,3 +9,7 @@ excluded_participants:
   - LENMDA172
   - LENMDA187
   - LENMDA191
+
+min_density: 0.1
+max_density: 0.6
+density_step: 0.05

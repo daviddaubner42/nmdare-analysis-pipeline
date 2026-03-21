@@ -20,10 +20,10 @@ ts = np.array(nib.load(args.ts_path).dataobj)
 ts = np.delete(ts, to_delete, 1)
 
 # Calculate the windowed FC matrices
-n_windows = (ts.shape[0] - args.window_size) // args.step_size + 1
+n_windows = len(range(0, ts.shape[0] - args.window_size, args.step_size))
 windowed_fcs = []
-for i in range(n_windows):
-    window_ts = ts[i*args.step_size : i*args.step_size + args.window_size]
+for i in range(0, ts.shape[0] - args.window_size, args.step_size):
+    window_ts = ts[i:i+args.window_size, :]
     fc = np.corrcoef(window_ts, rowvar=False)
     np.fill_diagonal(fc, np.nan)
     windowed_fcs.append(fc)

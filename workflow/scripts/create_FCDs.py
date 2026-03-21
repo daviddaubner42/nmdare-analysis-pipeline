@@ -12,9 +12,9 @@ parser.add_argument("--subid", type=str, help="The subid of the subject for whic
 args = parser.parse_args()
 
 with open(args.windowed_fc_path, "rb") as f:
-    windowed_fcs = pickle.load(f)
+    windowed_fcs = np.array(pickle.load(f))
 
-n_fcs = windowed_fcs[0].shape[0]
+n_fcs = windowed_fcs.shape[0]
 
 # Calculate the FCD matrix
 FCD = np.zeros((n_fcs, n_fcs))
@@ -34,8 +34,8 @@ for i in range(n_fcs):
 
 # Create the histogram of FCD values
 fcd_flattened = FCD[np.triu_indices_from(FCD)]
-hist = np.histogram(fcd_flattened, bins=100, range=(0, 1))
+hist, _ = np.histogram(fcd_flattened, bins=100, range=(0, 1))
 
 # Save the FCD matrix and histogram
-np.savetxt(os.path.join(args.out_dir, f"{args.subid}_FCD.csv"), FCD, delimiter=',')
-np.savetxt(os.path.join(args.out_dir, f"{args.subid}_FCD_hist.csv"), hist, delimiter=',')
+np.savetxt(os.path.join(args.out_dir, f"sub-{args.subid}_FCD.csv"), FCD, delimiter=',')
+np.savetxt(os.path.join(args.out_dir, f"sub-{args.subid}_FCD_hist.csv"), hist, delimiter=',')

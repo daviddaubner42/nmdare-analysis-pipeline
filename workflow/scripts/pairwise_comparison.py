@@ -22,6 +22,12 @@ for subid in args.subids:
     else:
         hc_fcs_regr.append(fc)
 
+# Create average FC for each group and save them
+avg_nmdare_fc = np.mean(nmdare_fcs_regr, axis=0)
+avg_hc_fc = np.mean(hc_fcs_regr, axis=0)
+np.savetxt(os.path.join(args.fc_dir, "avg_nmdare_fc.csv"), avg_nmdare_fc, delimiter=',')
+np.savetxt(os.path.join(args.fc_dir, "avg_hc_fc.csv"), avg_hc_fc, delimiter=',')
+
 # Fisher transform the FC values before statistical testing
 nmdare_fcs_fisher = np.arctanh(nmdare_fcs_regr)
 hc_fcs_fisher = np.arctanh(hc_fcs_regr)
@@ -34,7 +40,7 @@ p_vals = np.ones(nmdare_fcs_fisher.shape[1:])
 stats = np.ones(nmdare_fcs_fisher.shape[1:])
 for i in range(nmdare_fcs_fisher.shape[1]):
     for j in range(nmdare_fcs_fisher.shape[2]):
-        res = permutation_test([nmdare_fcs_fisher[:, i, j], hc_fcs_fisher[:, i, j]], statistic, permutation_type="independent", n_resamples=100000)
+        res = permutation_test([nmdare_fcs_fisher[:, i, j], hc_fcs_fisher[:, i, j]], statistic, permutation_type="independent", n_resamples=100000, rng=13)
         p_vals[i, j] = res.pvalue
         stats[i, j] = res.statistic
 np.fill_diagonal(p_vals, 1)
