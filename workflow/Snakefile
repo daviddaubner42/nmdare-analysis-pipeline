@@ -29,7 +29,7 @@ endfiles = [
 excluded = config["excluded_participants"]
 subids = [subid[4:] for subid in os.listdir(os.path.join(rawdir, "xcp_d")) if os.path.exists(os.path.join(rawdir, "xcp_d", f"{subid}", "func", f"{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_stat-pearsoncorrelation_boldmap.pconn.nii")) and subid[4:] not in excluded]
 
-local_metrics = ["betweenness_centrality", "degree_centrality", "clustering_coefficient", "avg_shortest_path_length"]
+local_metrics = ["betweenness_centrality", "degree_centrality", "clustering_coefficient", "avg_shortest_path_length", "participation_coeff"]
 
 rule all:
     """
@@ -527,25 +527,39 @@ rule calculate_avg_shortest_path_length:
         "mkdir -p {params.outdir}/results/graph_theory/local/sub-{wildcards.subid} && "
         "python {params.workflowdir}/scripts/calculate_avg_shortest_path_length.py --fc_path {input[0]} --out_path {output} --min_density {params.min_density} --max_density {params.max_density} --density_step {params.density_step} --labels_path {input[1]}"
 
+rule calculate_participation_coeff:
+    input:
+        os.path.join(outdir, "results", "static", "sub-{subid}", "sub-{subid}_FC_raw.csv"),
+        os.path.join(outdir, "intermediaries", "networks", "partition.pkl"),
+        os.path.join(outdir, "intermediaries", "networks", "partition_labels.pkl"),
+        os.path.join(outdir, "intermediaries", "networks", "to_delete_partition.pkl")
+    params:
+        workflowdir = workflowdir,
+        outdir = outdir,
+        min_density = config["min_density"],
+        max_density = config["max_density"],
+        density_step = config["density_step"]
+    output:
+        os.path.join(outdir, "results", "graph_theory", "local", "sub-{subid}", "sub-{subid}_participation_coeff.pkl")
+    conda:
+        os.path.join(environmentdir, "environment.yaml")
+    shell:
+        "mkdir -p {params.outdir}/results/graph_theory/local/sub-{wildcards.subid} && "
+        "python {params.workflowdir}/scripts/calculate_participation_coeff.py --fc_path {input[0]} --out_path {output} --min_density {params.min_density} --max_density {params.max_density} --density_step {params.density_step} --networks_dir {params.outdir}/intermediaries/networks"
+
 rule aggregate_local_metrics:
     input:
-        expand(os.path.join(outdir, "results", "graph_theory", "local", "sub-{subid}", "sub-{subid}_betweenness_centrality.pkl"), subid=subids),
-        expand(os.path.join(outdir, "results", "graph_theory", "local", "sub-{subid}", "sub-{subid}_degree_centrality.pkl"), subid=subids),
-        expand(os.path.join(outdir, "results", "graph_theory", "local", "sub-{subid}", "sub-{subid}_clustering_coefficient.pkl"), subid=subids),
-        expand(os.path.join(outdir, "results", "graph_theory", "local", "sub-{subid}", "sub-{subid}_avg_shortest_path_length.pkl"), subid=subids)
+        expand(os.path.join(outdir, "results", "graph_theory", "local", "sub-{subid}", "sub-{subid}_{{metric}}.pkl"), subid=subids)
     params:
         workflowdir = workflowdir,
         outdir = outdir,
         subids = subids
     output:
-        os.path.join(outdir, "results", "graph_theory", "local", "betweenness_centrality_aggregated.csv"),
-        os.path.join(outdir, "results", "graph_theory", "local", "degree_centrality_aggregated.csv"),
-        os.path.join(outdir, "results", "graph_theory", "local", "clustering_coefficient_aggregated.csv"),
-        os.path.join(outdir, "results", "graph_theory", "local", "avg_shortest_path_length_aggregated.csv")
+        os.path.join(outdir, "results", "graph_theory", "local", "{metric}_aggregated.csv")
     conda:
         os.path.join(environmentdir, "environment.yaml")
     shell:
-        "python {params.workflowdir}/scripts/aggregate_local_metrics.py --results_dir {params.outdir}/results/graph_theory/local/ --subids {params.subids}"
+        "python {params.workflowdir}/scripts/aggregate_local_metrics.py --results_dir {params.outdir}/results/graph_theory/local/ --subids {params.subids} --metric {wildcards.metric}"
 
 rule local_metric_comparison:
     input:
