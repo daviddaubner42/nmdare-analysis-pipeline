@@ -310,7 +310,7 @@ rule resample_cortical_labels:
     shell:
         "mkdir -p {params.conversion_dir} && "
 
-        "{params.workflow_dir}/scripts/intermediaries/wb_shortcuts.sh -freesurfer-resample-prep "
+        "{params.workflow_dir}/scripts/preprocessing/wb_shortcuts.sh -freesurfer-resample-prep "
         "{params.fs_dir}/sub-{wildcards.subid}/surf/lh.white "
         "{params.fs_dir}/sub-{wildcards.subid}/surf/lh.pial "
         "{params.fs_dir}/sub-{wildcards.subid}/surf/lh.sphere.reg "
@@ -319,7 +319,7 @@ rule resample_cortical_labels:
         "{params.conversion_dir}/lh.midthickness.32k_fs_LR.surf.gii "
         "{params.conversion_dir}/lh.sphere.reg.surf.gii && "
 
-        "{params.workflow_dir}/scripts/intermediaries/wb_shortcuts.sh -freesurfer-resample-prep "
+        "{params.workflow_dir}/scripts/preprocessing/wb_shortcuts.sh -freesurfer-resample-prep "
         "{params.fs_dir}/sub-{wildcards.subid}/surf/rh.white "
         "{params.fs_dir}/sub-{wildcards.subid}/surf/rh.pial "
         "{params.fs_dir}/sub-{wildcards.subid}/surf/rh.sphere.reg "
@@ -384,7 +384,7 @@ rule generate_remap:
             "environment.yaml"
         )
     shell:
-        "python {params.workflow_dir}/scripts/intermediaries/create_remap.py "
+        "python {params.workflow_dir}/scripts/preprocessing/create_remap.py "
         "-input {params.conversion_dir}/aparc.rh.32k_fs_LR.label.gii "
         "-output {params.conversion_dir}/remap.txt"
 
@@ -555,7 +555,7 @@ rule create_atlas_info:
             "environment.yaml"
         )
     shell:
-        "python {params.workflow_dir}/scripts/intermediaries/create_atlas_info.py "
+        "python {params.workflow_dir}/scripts/preprocessing/create_atlas_info.py "
         "-atlas_file {params.out_dir}/atlases/sub-{wildcards.subid}/atlas-DesikanKilliany/atlas-DesikanKilliany_space-fsLR_den-32k_dseg.dlabel.nii "
         "-output {params.out_dir}/atlases/sub-{wildcards.subid}/atlas-DesikanKilliany/atlas-DesikanKilliany_dseg.tsv && "
 
