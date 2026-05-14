@@ -1,0 +1,7 @@
+{
+  "FunctionalConnectivityMeasure": "pearson",
+  "Atlas": "DesikanKilliany",
+  "WindowType": "sliding",
+  "WindowLengthTR": 30,
+  "WindowStepTR": 1
+}

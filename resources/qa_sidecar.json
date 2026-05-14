@@ -1,0 +1,4 @@
+{
+  "QCPipelineScript": "bids_to_fc_graph_pipeline/workflow/qa.smk",
+  "QCPipelineVersion": "1.0"
+}

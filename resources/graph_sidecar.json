@@ -1,0 +1,7 @@
+{
+    "GraphThresholdMethod": "proportional",
+    "MinDensity": 0.1,
+    "MaxDensity": 0.6,
+    "DensityStep": 0.05
+}
+  

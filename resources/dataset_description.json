@@ -1,0 +1,39 @@
+{
+  "Name": "Static and dynamic FC analysis with graph theory metrics",
+  "BIDSVersion": "1.9.0",
+  "DatasetType": "derivative",
+  "GeneratedBy": [
+    {
+      "Name": "NMDARE-analysis pipeline",
+      "CodeURL": "https://github.com/daviddaubner42/nmdare-analysis-pipeline"
+    }
+  ],
+  "SourceDatasets": [
+    {
+      "DOI": "",
+      "URL": ""
+    }
+  ],
+  "Authors": [
+    {
+      "Name": "David Daubner",
+      "Affiliation": "Charité – Universitätsmedizin Berlin, Corporate Member of Freie Universität Berlin and Humboldt-Universität zu Berlin, Department of Neurology with Experimental Neurology, Brain Simulation Section, Charitéplatz 1, 10117 Berlin, Germany"
+    },
+    {
+      "Name": "Halgurd Taher",
+      "Affiliation": "Charité – Universitätsmedizin Berlin, Corporate Member of Freie Universität Berlin and Humboldt-Universität zu Berlin, Department of Neurology with Experimental Neurology, Brain Simulation Section, Charitéplatz 1, 10117 Berlin, Germany"
+    },
+    {
+      "Name": "Leon Stefanovski",
+      "Affiliation": "Charité – Universitätsmedizin Berlin, Corporate Member of Freie Universität Berlin and Humboldt-Universität zu Berlin, Department of Neurology with Experimental Neurology, Brain Simulation Section, Charitéplatz 1, 10117 Berlin, Germany"
+    },
+    {
+      "Name": "Petra Ritter",
+      "Affiliation": "Charité – Universitätsmedizin Berlin, Corporate Member of Freie Universität Berlin and Humboldt-Universität zu Berlin, Department of Neurology with Experimental Neurology, Brain Simulation Section, Charitéplatz 1, 10117 Berlin, Germany"
+    },
+    {
+      "Name": "Carsten Finke",
+      "Affiliation": "Charité – Universitätsmedizin Berlin, Corporate Member of Freie Universität Berlin and Humboldt-Universität zu Berlin, Department of Neurology with Experimental Neurology, Cognitive Neurology Lab, Charitéplatz 1, 10117 Berlin, Germany"
+    }
+  ]
+}
