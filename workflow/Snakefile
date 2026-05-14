@@ -45,7 +45,7 @@ endfiles = [
 
 # Define the subject IDs to be processed
 excluded = config["excluded_participants"]
-subids = [subid[4:] for subid in os.listdir(os.path.join(outdir, "derivatives", "xcp_d")) if os.path.exists(os.path.join(outdir, "derivatives", "xcp_d", f"{subid}", "func", f"{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_stat-pearsoncorrelation_boldmap.pconn.nii")) and subid[4:] not in excluded]
+subids = [subid[4:] for subid in os.listdir(os.path.join(outdir, "bids")) if subid.startswith('sub-') and subid[4:] not in excluded]
 # subids = [i[4:] for i in os.listdir(rawdir) if i.startswith('sub-')]
 # subids = ["LEGK010"]
 
