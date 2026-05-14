@@ -25,13 +25,12 @@ rule create_bids_filter_file:
 # https://fmriprep.org/en/stable/
 rule fmriprep:
     input:
-        filter=os.path.join(outdir, "derivatives", "temp", "sub-{subid}_bidsfilter.json"),
         os.path.join(rawdir, "sub-{subid}", "anat", "sub-{subid}_T1w.nii.gz"),
-        os.path.join(rawdir, "sub-{subid}", "anat", "sub-{subid}_T2w.nii.gz"), # comment out if your data does not contain T2
         os.path.join(rawdir, "sub-{subid}", "fmap", "sub-{subid}_magnitude1.nii.gz"),
         os.path.join(rawdir, "sub-{subid}", "fmap", "sub-{subid}_magnitude2.nii.gz"),
         os.path.join(rawdir, "sub-{subid}", "fmap", "sub-{subid}_phasediff.nii.gz"),
-        os.path.join(rawdir, "sub-{subid}", "func", "sub-{subid}_task-rest_bold.nii.gz")
+        os.path.join(rawdir, "sub-{subid}", "func", "sub-{subid}_task-rest_bold.nii.gz"),
+        filter=os.path.join(outdir, "derivatives", "temp", "sub-{subid}_bidsfilter.json")
     params:
         bids_dir=rawdir,
         out_dir=derivatives_dir,
