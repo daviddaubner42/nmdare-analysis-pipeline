@@ -95,7 +95,6 @@ rule fmriprep:
         "--cifti-output "
         "--skip-bids-validation "
         "--nthreads 16 "
-        "--omp-nthreads 16"
         "--bids-filter-file {input.filter}"
 
 # Register the FreeSurfer subcortical segmentation into the MNI space and convert it to Nifti
