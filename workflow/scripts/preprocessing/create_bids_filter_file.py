@@ -21,7 +21,8 @@ filter = {
 
 t2_options = []
 for f in os.listdir(os.path.join(args.bids_dir, f"sub-{args.subid}", "anat")):
-    if "t2" in f and not ".json" in f:
+    print(f)
+    if "T2" in f and not ".json" in f:
         t2_options.append(f)
 
 good_options = []
@@ -31,7 +32,7 @@ for f in t2_options:
         t2_header = json.load(j)
     if t2.dataobj.shape[1] == 256 and t2_header["RepetitionTime"] == 6.0:
         good_options.append(f)
-final = None
+
 if len(good_options) == 1:
     final = good_options[0]
 elif len(good_options) == 0:
