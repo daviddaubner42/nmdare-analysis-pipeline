@@ -1,8 +1,8 @@
 name: snake_env
 channels:
-  - defaults
   - conda-forge
   - bioconda
+  - nodefaults
 dependencies:
   - snakemake
   - pip
@@ -17,5 +17,6 @@ dependencies:
   - openpyxl
   - scikit-learn
   - scienceplots
+  - pydicom
   - pip:
     - networkx_robustness
