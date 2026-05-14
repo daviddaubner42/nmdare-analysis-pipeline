@@ -1,6 +1,6 @@
-# """ This file contains rules used to preprocess the raw MRI data in BIDS format to produce a cleaned average timeseries for each ROI """
+""" This file contains rules used to preprocess the raw MRI data in BIDS format to produce a cleaned average timeseries for each ROI """
 
-# derivatives_dir = os.path.join(outdir, "derivatives")
+derivatives_dir = os.path.join(outdir, "derivatives")
 
  # Create a bids filter file for each subject, to be used in the fMRIPrep workflow
 rule create_bids_filter_file:
