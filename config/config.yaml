@@ -1,14 +1,21 @@
-datadir:  "/Users/brainsimulation/Desktop/derivatives_dk_T2uniform/derivatives"
-rootdir: "/Users/brainsimulation/Desktop/nmdare-analysis/"
-outdir: "/Users/brainsimulation/Desktop/nmdare-analysis/out"
+datadir:  "/Users/brainsimulation/Desktop/NMDARE_Project/bids"
+rootdir: "/Users/brainsimulation/Desktop/NMDARE_Project/bids_to_fc_graph_pipeline/"
+outdir: "/Users/brainsimulation/Desktop/NMDARE_Project/"
+
+# The singularity containers used by the pipeline
+containers:
+  fmriprep: docker://nipreps/fmriprep:25.0.0
+  freesurfer: docker://freesurfer/freesurfer:7.4.1
+  xcp_d: docker://pennlinc/xcp_d:0.11.0
+  wb_command: docker://vnmd/connectomeworkbench_2.0.1:latest
 
 excluded_participants:
   - RSGK017
-  - LENMDA001
-  - LENMDA006
-  - LENMDA172
-  - LENMDA187
-  - LENMDA191
+  # - LENMDA001
+  # - LENMDA006
+  # - LENMDA172
+  # - LENMDA187
+  # - LENMDA191
 
 min_density: 0.1
 max_density: 0.6
