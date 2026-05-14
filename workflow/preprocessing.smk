@@ -19,7 +19,7 @@ rule create_bids_filter_file:
         os.path.join(environmentdir, "environment.yaml")
     shell:
         "mkdir -p {params.outdir}/derivatives/temp && "
-        "python {workflowdir}/scripts/preprocessing/create_bids_filter_file.py --bids_dir {params.rawdir} --subid {wildcards.subid} --output_file {output}"
+        "python {workflowdir}/scripts/preprocessing/create_bids_filter_file.py --bids_dir {params.rawdir} --subid {wildcards.subid} --output_path {output}"
 
 # Apply fMRIPrep preprocessing pipeline to the data
 # https://fmriprep.org/en/stable/
