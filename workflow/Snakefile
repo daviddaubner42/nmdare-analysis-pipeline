@@ -15,32 +15,32 @@ os.makedirs(outdir, exist_ok=True)
 
 # Specifies the files which should exist at the end of the processing
 endfiles = [
-    # os.path.join(outdir, "derivatives", "static", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-rawFC_relmat.tsv"),
-    # os.path.join(outdir, "derivatives", "dynamic", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-FCD_relmat.tsv"),
-    # os.path.join(outdir, "derivatives", "dynamic", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-FCDhistogram_histogram.tsv"),
-    # os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-avgClustering_relmat.pkl"),
-    # os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-globalEfficiency_relmat.pkl"),
-    # os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-assortativity_relmat.pkl"),
-    # os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-robustnessRandom_relmat.pkl"),
-    # os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-robustnessTargeted_relmat.pkl"),
-    # os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-modularity_relmat.pkl"),
-    # os.path.join(outdir, "derivatives", "graph_theory", "global", "task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-globalMetrics_relmat.tsv"),
-    # os.path.join(outdir, "derivatives", "graph_theory", "local", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-betweennessCentrality_relmat.pkl"),
-    # os.path.join(outdir, "derivatives", "graph_theory", "local", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-degreeCentrality_relmat.pkl"),
-    # os.path.join(outdir, "derivatives", "graph_theory", "local", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-clusteringCoefficient_relmat.pkl"),
-    # os.path.join(outdir, "derivatives", "graph_theory", "local", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-avgShortestPathLength_relmat.pkl"),
-    # os.path.join(outdir, "derivatives", "graph_theory", "local", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-participationCoeff_relmat.pkl"),
+    os.path.join(outdir, "derivatives", "static", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-rawFC_relmat.tsv"),
+    os.path.join(outdir, "derivatives", "dynamic", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-FCD_relmat.tsv"),
+    os.path.join(outdir, "derivatives", "dynamic", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-FCDhistogram_histogram.tsv"),
+    os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-avgClustering_relmat.pkl"),
+    os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-globalEfficiency_relmat.pkl"),
+    os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-assortativity_relmat.pkl"),
+    os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-robustnessRandom_relmat.pkl"),
+    os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-robustnessTargeted_relmat.pkl"),
+    os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-modularity_relmat.pkl"),
+    os.path.join(outdir, "derivatives", "graph_theory", "global", "task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-globalMetrics_relmat.tsv"),
+    os.path.join(outdir, "derivatives", "graph_theory", "local", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-betweennessCentrality_relmat.pkl"),
+    os.path.join(outdir, "derivatives", "graph_theory", "local", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-degreeCentrality_relmat.pkl"),
+    os.path.join(outdir, "derivatives", "graph_theory", "local", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-clusteringCoefficient_relmat.pkl"),
+    os.path.join(outdir, "derivatives", "graph_theory", "local", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-avgShortestPathLength_relmat.pkl"),
+    os.path.join(outdir, "derivatives", "graph_theory", "local", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-participationCoeff_relmat.pkl"),
     # QA outputs
     os.path.join(outdir, "derivatives", "quality_control", "desc-metadataCheck_log.txt"),
-    # os.path.join(outdir, "derivatives", "quality_control", "figures", "task-rest_desc-maxFramewiseDisplacementScatter_figure.png"),
-    # os.path.join(outdir, "derivatives", "quality_control", "task-rest_desc-framewiseDisplacement_log.txt"),
-    # os.path.join(outdir, "derivatives", "quality_control", "sub-{subid}", "figures", "sub-{subid}_task-rest_desc-rawVsClean_figure.png"),
-    # os.path.join(outdir, "derivatives", "quality_control", "task-rest_desc-denoisingVerification_log.txt"),
-    # os.path.join(outdir, "derivatives", "quality_control", "figures", "task-rest_desc-qcFcCorrelationHistograms_figure.png"),
-    # os.path.join(outdir, "derivatives", "quality_control", "figures", "task-rest_desc-qcFcDistanceCorrelation_figure.png"),
-    # os.path.join(outdir, "derivatives", "quality_control", "task-rest_desc-qcFc_log.txt"),
+    os.path.join(outdir, "derivatives", "quality_control", "figures", "task-rest_desc-maxFramewiseDisplacementScatter_figure.png"),
+    os.path.join(outdir, "derivatives", "quality_control", "task-rest_desc-framewiseDisplacement_log.txt"),
+    os.path.join(outdir, "derivatives", "quality_control", "sub-{subid}", "figures", "sub-{subid}_task-rest_desc-rawVsClean_figure.png"),
+    os.path.join(outdir, "derivatives", "quality_control", "task-rest_desc-denoisingVerification_log.txt"),
+    os.path.join(outdir, "derivatives", "quality_control", "figures", "task-rest_desc-qcFcCorrelationHistograms_figure.png"),
+    os.path.join(outdir, "derivatives", "quality_control", "figures", "task-rest_desc-qcFcDistanceCorrelation_figure.png"),
+    os.path.join(outdir, "derivatives", "quality_control", "task-rest_desc-qcFc_log.txt"),
 
-    # os.path.join(outdir, "derivatives", "dataset_description.json")
+    os.path.join(outdir, "derivatives", "dataset_description.json")
 ]
 
 # Define the subject IDs to be processed
