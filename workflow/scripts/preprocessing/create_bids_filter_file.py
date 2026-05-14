@@ -46,9 +46,9 @@ elif len(good_options) > 1:
             final = f
 
 if "acq-3DSPACE" in final:
-    filter["t2w"]["acquistion"] = "3DSPACE"
+    filter["t2w"]["acquisition"] = "3DSPACE"
 elif "acq-SPACE" in final:
-    filter["t2w"]["acquistion"] = "SPACE"
+    filter["t2w"]["acquisition"] = "SPACE"
 
 with open(args.output_path, "w") as f:
     json.dump(filter, f, indent=4)
