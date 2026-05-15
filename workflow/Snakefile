@@ -58,7 +58,7 @@ rule all:
     """
     input:
         expand(endfiles, subid=subids, metric=local_metrics),
-        expand(os.path.join(derivatives_dir, "fmriprep", "sub-{subid}", "func", "sub-{subid}_task-rest_space-fsLR_den-91k_bold.dtseries.nii"), subid=subids_all),
+        expand(os.path.join(outdir, "derivatives", "fmriprep", "sub-{subid}", "func", "sub-{subid}_task-rest_space-fsLR_den-91k_bold.dtseries.nii"), subid=subids_all),
     shell:
         "rm -rf {outdir}/intermediaries && "
         "rm -rf {outdir}/derivatives/atlases && "
