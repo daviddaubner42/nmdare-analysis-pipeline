@@ -35,7 +35,8 @@ rule get_dicom_metadata:
 rule metadata_check:
     input:
         os.path.join(outdir, "derivatives", "quality_control", "desc-dicomMetadata_summary.pkl"),
-        os.path.join(rawdir, "sub-LEGK010", "func", "sub-LEGK010_task-rest_bold.nii.gz")
+        expand(os.path.join(rawdir, "sub-{subid}", "func", "sub-{subid}_task-rest_bold.nii.gz"), subid=subids),
+        expand(os.path.join(outdir, "derivatives", "temp", "sub-{subid}_bidsfilter.json"), subid=subids_all)
     params:
         outdir=outdir,
         workflowdir=workflowdir,

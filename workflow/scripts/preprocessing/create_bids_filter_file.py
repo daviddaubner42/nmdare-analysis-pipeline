@@ -21,7 +21,6 @@ filter = {
 
 t2_options = []
 for f in os.listdir(os.path.join(args.bids_dir, f"sub-{args.subid}", "anat")):
-    print(f)
     if "T2" in f and not ".json" in f:
         t2_options.append(f)
 
