@@ -1,350 +1,350 @@
-# """ This file contains rules used to produce static and dynamic FC derivatives and calculate the graph theory metrics for each participant """
+""" This file contains rules used to produce static and dynamic FC derivatives and calculate the graph theory metrics for each participant """
 
-# # Prep
+# Prep
 
-# rule create_data_description:
-#     input:
-#         os.path.join("resources", "dataset_description.json")
-#     params:
-#         workflowdir = workflowdir,
-#         outdir = outdir
-#     output:
-#         os.path.join(outdir, "derivatives", "dataset_description.json")
-#     conda:
-#         os.path.join(environmentdir, "environment.yaml")
-#     shell:
-#         "mkdir -p {params.outdir}/derivatives && "
-#         "cp {input} {output}"
+rule create_data_description:
+    input:
+        os.path.join("resources", "dataset_description.json")
+    params:
+        workflowdir = workflowdir,
+        outdir = outdir
+    output:
+        os.path.join(outdir, "derivatives", "dataset_description.json")
+    conda:
+        os.path.join(environmentdir, "environment.yaml")
+    shell:
+        "mkdir -p {params.outdir}/derivatives && "
+        "cp {input} {output}"
 
-# rule get_neat_demo_data:
-#     input: 
-#         os.path.join(resourcedir, "demographics.xlsx")
-#     params:
-#         workflowdir = workflowdir,
-#         outdir = outdir
-#     output: 
-#         os.path.join(outdir, "intermediaries", "demo_data.csv")
-#     conda:
-#         os.path.join(environmentdir, "environment.yaml")
-#     shell:
-#         "mkdir -p {params.outdir}/intermediaries && " 
-#         "python {params.workflowdir}/scripts/intermediaries/get_neat_demo_data.py --input_file {input} --output_file {output}"
+rule get_neat_demo_data:
+    input: 
+        os.path.join(resourcedir, "demographics.xlsx")
+    params:
+        workflowdir = workflowdir,
+        outdir = outdir
+    output: 
+        os.path.join(outdir, "intermediaries", "demo_data.csv")
+    conda:
+        os.path.join(environmentdir, "environment.yaml")
+    shell:
+        "mkdir -p {params.outdir}/intermediaries && " 
+        "python {params.workflowdir}/scripts/intermediaries/get_neat_demo_data.py --input_file {input} --output_file {output}"
 
-# rule create_networks:
-#     input:
-#         os.path.join(resourcedir, "atlas-DesikanKilliany_dseg.tsv")
-#     params:
-#         resourcedir = resourcedir,
-#         workflowdir = workflowdir,
-#         outdir = outdir
-#     output:
-#         os.path.join(outdir, "intermediaries", "networks", "networks.pkl"),
-#         os.path.join(outdir, "intermediaries", "networks", "network_names.pkl"),
-#         os.path.join(outdir, "intermediaries", "networks", "partition.pkl"),
-#         os.path.join(outdir, "intermediaries", "networks", "to_delete_network.pkl"),
-#         os.path.join(outdir, "intermediaries", "networks", "to_delete_partition.pkl"),
-#         os.path.join(outdir, "intermediaries", "networks", "network_labels.pkl"),
-#         os.path.join(outdir, "intermediaries", "networks", "partition_labels.pkl")
-#     conda:
-#         os.path.join(environmentdir, "environment.yaml")
-#     shell:
-#         "python {params.workflowdir}/scripts/intermediaries/create_networks.py --seg_file {input} --out_dir {params.outdir}/intermediaries/networks"
+rule create_networks:
+    input:
+        os.path.join(resourcedir, "atlas-DesikanKilliany_dseg.tsv")
+    params:
+        resourcedir = resourcedir,
+        workflowdir = workflowdir,
+        outdir = outdir
+    output:
+        os.path.join(outdir, "intermediaries", "networks", "networks.pkl"),
+        os.path.join(outdir, "intermediaries", "networks", "network_names.pkl"),
+        os.path.join(outdir, "intermediaries", "networks", "partition.pkl"),
+        os.path.join(outdir, "intermediaries", "networks", "to_delete_network.pkl"),
+        os.path.join(outdir, "intermediaries", "networks", "to_delete_partition.pkl"),
+        os.path.join(outdir, "intermediaries", "networks", "network_labels.pkl"),
+        os.path.join(outdir, "intermediaries", "networks", "partition_labels.pkl")
+    conda:
+        os.path.join(environmentdir, "environment.yaml")
+    shell:
+        "python {params.workflowdir}/scripts/intermediaries/create_networks.py --seg_file {input} --out_dir {params.outdir}/intermediaries/networks"
 
-# """ ------------------------------------------- """
-# """ -------- Static FC analysis rules --------- """
-# """ ------------------------------------------- """
+""" ------------------------------------------- """
+""" -------- Static FC analysis rules --------- """
+""" ------------------------------------------- """
 
-# rule create_raw_fc:
-#     input:
-#         exc=os.path.join(outdir, "intermediaries", "networks", "to_delete_network.pkl"),
-#         ts=os.path.join(outdir, "derivatives", "xcp_d", "sub-{subid}", "func", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_stat-mean_timeseries.ptseries.nii")
-#     params:
-#         workflowdir = workflowdir,
-#         outdir = outdir
-#     output:
-#         os.path.join(outdir, "derivatives", "static", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-rawFC_relmat.tsv"),
-#         os.path.join(outdir, "derivatives", "static", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-rawFC_relmat.json")
-#     conda:
-#         os.path.join(environmentdir, "environment.yaml")
-#     shell:
-#         "mkdir -p {params.outdir}/derivatives/static/sub-{wildcards.subid} && "
-#         "python {params.workflowdir}/scripts/derivatives_creation/static/create_raw_fc.py --ts_path {input.ts} --excluded_rois_path {input.exc} --out_path {output[0]} --sidecar_path {output[1]} --subid {wildcards.subid}"
+rule create_raw_fc:
+    input:
+        exc=os.path.join(outdir, "intermediaries", "networks", "to_delete_network.pkl"),
+        ts=os.path.join(outdir, "derivatives", "xcp_d", "sub-{subid}", "func", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_stat-mean_timeseries.ptseries.nii")
+    params:
+        workflowdir = workflowdir,
+        outdir = outdir
+    output:
+        os.path.join(outdir, "derivatives", "static", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-rawFC_relmat.tsv"),
+        os.path.join(outdir, "derivatives", "static", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-rawFC_relmat.json")
+    conda:
+        os.path.join(environmentdir, "environment.yaml")
+    shell:
+        "mkdir -p {params.outdir}/derivatives/static/sub-{wildcards.subid} && "
+        "python {params.workflowdir}/scripts/derivatives_creation/static/create_raw_fc.py --ts_path {input.ts} --excluded_rois_path {input.exc} --out_path {output[0]} --sidecar_path {output[1]} --subid {wildcards.subid}"
 
-# """ ------------------------------------------- """
-# """ ------- Dynamic FC analysis rules --------- """
-# """ ------------------------------------------- """
+""" ------------------------------------------- """
+""" ------- Dynamic FC analysis rules --------- """
+""" ------------------------------------------- """
 
-# rule create_windowed_fcs:
-#     input:
-#         exc=os.path.join(outdir, "intermediaries", "networks", "to_delete_network.pkl"),
-#         ts=os.path.join(outdir, "derivatives", "xcp_d", "sub-{subid}", "func", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_stat-mean_timeseries.ptseries.nii")
-#     params:
-#         workflowdir = workflowdir,
-#         outdir = outdir
-#     output:
-#         os.path.join(outdir, "derivatives", "dynamic", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-windowedFCs_relmat.pkl"),
-#         os.path.join(outdir, "derivatives", "dynamic", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-windowedFCs_relmat.json")
-#     conda:
-#         os.path.join(environmentdir, "environment.yaml")
-#     shell:
-#         "mkdir -p {params.outdir}/derivatives/dynamic/sub-{wildcards.subid} && "
-#         "python {params.workflowdir}/scripts/derivatives_creation/dynamic/create_windowed_fcs.py --ts_path {input.ts} --excluded_rois_path {input.exc} --out_path {output[0]} --sidecar_path {output[1]} --window_size 30 --step_size 1 --subid {wildcards.subid}"
+rule create_windowed_fcs:
+    input:
+        exc=os.path.join(outdir, "intermediaries", "networks", "to_delete_network.pkl"),
+        ts=os.path.join(outdir, "derivatives", "xcp_d", "sub-{subid}", "func", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_stat-mean_timeseries.ptseries.nii")
+    params:
+        workflowdir = workflowdir,
+        outdir = outdir
+    output:
+        os.path.join(outdir, "derivatives", "dynamic", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-windowedFCs_relmat.pkl"),
+        os.path.join(outdir, "derivatives", "dynamic", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-windowedFCs_relmat.json")
+    conda:
+        os.path.join(environmentdir, "environment.yaml")
+    shell:
+        "mkdir -p {params.outdir}/derivatives/dynamic/sub-{wildcards.subid} && "
+        "python {params.workflowdir}/scripts/derivatives_creation/dynamic/create_windowed_fcs.py --ts_path {input.ts} --excluded_rois_path {input.exc} --out_path {output[0]} --sidecar_path {output[1]} --window_size 30 --step_size 1 --subid {wildcards.subid}"
 
-# rule create_FCDs:
-#     input:
-#         os.path.join(outdir, "derivatives", "dynamic", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-windowedFCs_relmat.pkl")
-#     params:
-#         workflowdir = workflowdir,
-#         outdir = outdir,
-#         fcdir = os.path.join(outdir, "derivatives", "dynamic"),
-#         subids=subids
-#     output:
-#         os.path.join(outdir, "derivatives", "dynamic", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-FCD_relmat.tsv"),
-#         os.path.join(outdir, "derivatives", "dynamic", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-FCDhistogram_histogram.tsv")
-#     conda:
-#         os.path.join(environmentdir, "environment.yaml")
-#     shell:
-#         "python {params.workflowdir}/scripts/derivatives_creation/dynamic/create_FCDs.py --windowed_fc_path {input} --out_dir {params.outdir}/derivatives/dynamic/sub-{wildcards.subid} --subid {wildcards.subid}"
+rule create_FCDs:
+    input:
+        os.path.join(outdir, "derivatives", "dynamic", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-windowedFCs_relmat.pkl")
+    params:
+        workflowdir = workflowdir,
+        outdir = outdir,
+        fcdir = os.path.join(outdir, "derivatives", "dynamic"),
+        subids=subids
+    output:
+        os.path.join(outdir, "derivatives", "dynamic", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-FCD_relmat.tsv"),
+        os.path.join(outdir, "derivatives", "dynamic", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-FCDhistogram_histogram.tsv")
+    conda:
+        os.path.join(environmentdir, "environment.yaml")
+    shell:
+        "python {params.workflowdir}/scripts/derivatives_creation/dynamic/create_FCDs.py --windowed_fc_path {input} --out_dir {params.outdir}/derivatives/dynamic/sub-{wildcards.subid} --subid {wildcards.subid}"
 
-# """ ------------------------------------------- """
-# """ ------ Graph theory analysis rules -------- """
-# """ ------------------------------------------- """
+""" ------------------------------------------- """
+""" ------ Graph theory analysis rules -------- """
+""" ------------------------------------------- """
 
-# """ Global metrics """
+""" Global metrics """
 
-# rule calculate_avg_clustering:
-#     input:
-#         os.path.join(outdir, "derivatives", "static", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-rawFC_relmat.tsv"),
-#         os.path.join(outdir, "intermediaries", "networks", "network_labels.pkl")
-#     params:
-#         workflowdir = workflowdir,
-#         outdir = outdir,
-#         min_density = config["min_density"],
-#         max_density = config["max_density"],
-#         density_step = config["density_step"]
-#     output:
-#         os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-avgClustering_relmat.pkl"),
-#         os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-avgClustering_relmat.json")
-#     conda:
-#         os.path.join(environmentdir, "environment.yaml")
-#     shell:
-#         "mkdir -p {params.outdir}/derivatives/graph_theory/global/sub-{wildcards.subid} && "
-#         "python {params.workflowdir}/scripts/derivatives_creation/graph_theory/global/calculate_avg_clustering.py --input_path {input[0]} --out_path {output[0]} --min_density {params.min_density} --max_density {params.max_density} --density_step {params.density_step} --labels_path {input[1]} --sidecar_path {output[1]} --subid {wildcards.subid}"
+rule calculate_avg_clustering:
+    input:
+        os.path.join(outdir, "derivatives", "static", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-rawFC_relmat.tsv"),
+        os.path.join(outdir, "intermediaries", "networks", "network_labels.pkl")
+    params:
+        workflowdir = workflowdir,
+        outdir = outdir,
+        min_density = config["min_density"],
+        max_density = config["max_density"],
+        density_step = config["density_step"]
+    output:
+        os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-avgClustering_relmat.pkl"),
+        os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-avgClustering_relmat.json")
+    conda:
+        os.path.join(environmentdir, "environment.yaml")
+    shell:
+        "mkdir -p {params.outdir}/derivatives/graph_theory/global/sub-{wildcards.subid} && "
+        "python {params.workflowdir}/scripts/derivatives_creation/graph_theory/global/calculate_avg_clustering.py --input_path {input[0]} --out_path {output[0]} --min_density {params.min_density} --max_density {params.max_density} --density_step {params.density_step} --labels_path {input[1]} --sidecar_path {output[1]} --subid {wildcards.subid}"
 
-# rule calculate_global_efficiency:
-#     input:
-#         os.path.join(outdir, "derivatives", "static", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-rawFC_relmat.tsv"),
-#         os.path.join(outdir, "intermediaries", "networks", "network_labels.pkl")
-#     params:
-#         workflowdir = workflowdir,
-#         outdir = outdir,
-#         min_density = config["min_density"],
-#         max_density = config["max_density"],
-#         density_step = config["density_step"]
-#     output:
-#         os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-globalEfficiency_relmat.pkl"),
-#         os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-globalEfficiency_relmat.json")
-#     conda:
-#         os.path.join(environmentdir, "environment.yaml")
-#     shell:
-#         "mkdir -p {params.outdir}/derivatives/graph_theory/global/sub-{wildcards.subid} && "
-#         "python {params.workflowdir}/scripts/derivatives_creation/graph_theory/global/calculate_global_efficiency.py --input_path {input[0]} --out_path {output[0]} --min_density {params.min_density} --max_density {params.max_density} --density_step {params.density_step} --labels_path {input[1]} --sidecar_path {output[1]} --subid {wildcards.subid}"
+rule calculate_global_efficiency:
+    input:
+        os.path.join(outdir, "derivatives", "static", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-rawFC_relmat.tsv"),
+        os.path.join(outdir, "intermediaries", "networks", "network_labels.pkl")
+    params:
+        workflowdir = workflowdir,
+        outdir = outdir,
+        min_density = config["min_density"],
+        max_density = config["max_density"],
+        density_step = config["density_step"]
+    output:
+        os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-globalEfficiency_relmat.pkl"),
+        os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-globalEfficiency_relmat.json")
+    conda:
+        os.path.join(environmentdir, "environment.yaml")
+    shell:
+        "mkdir -p {params.outdir}/derivatives/graph_theory/global/sub-{wildcards.subid} && "
+        "python {params.workflowdir}/scripts/derivatives_creation/graph_theory/global/calculate_global_efficiency.py --input_path {input[0]} --out_path {output[0]} --min_density {params.min_density} --max_density {params.max_density} --density_step {params.density_step} --labels_path {input[1]} --sidecar_path {output[1]} --subid {wildcards.subid}"
 
-# rule calculate_assortativity:
-#     input:
-#         os.path.join(outdir, "derivatives", "static", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-rawFC_relmat.tsv"),
-#         os.path.join(outdir, "intermediaries", "networks", "network_labels.pkl")
-#     params:
-#         workflowdir = workflowdir,
-#         outdir = outdir,
-#         min_density = config["min_density"],
-#         max_density = config["max_density"],
-#         density_step = config["density_step"]
-#     output:
-#         os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-assortativity_relmat.pkl"),
-#         os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-assortativity_relmat.json")
-#     conda:
-#         os.path.join(environmentdir, "environment.yaml")
-#     shell:
-#         "mkdir -p {params.outdir}/derivatives/graph_theory/global/sub-{wildcards.subid} && "
-#         "python {params.workflowdir}/scripts/derivatives_creation/graph_theory/global/calculate_assortativity.py --input_path {input[0]} --out_path {output[0]} --min_density {params.min_density} --max_density {params.max_density} --density_step {params.density_step} --labels_path {input[1]} --subid {wildcards.subid} --sidecar_path {output[1]}"
+rule calculate_assortativity:
+    input:
+        os.path.join(outdir, "derivatives", "static", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-rawFC_relmat.tsv"),
+        os.path.join(outdir, "intermediaries", "networks", "network_labels.pkl")
+    params:
+        workflowdir = workflowdir,
+        outdir = outdir,
+        min_density = config["min_density"],
+        max_density = config["max_density"],
+        density_step = config["density_step"]
+    output:
+        os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-assortativity_relmat.pkl"),
+        os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-assortativity_relmat.json")
+    conda:
+        os.path.join(environmentdir, "environment.yaml")
+    shell:
+        "mkdir -p {params.outdir}/derivatives/graph_theory/global/sub-{wildcards.subid} && "
+        "python {params.workflowdir}/scripts/derivatives_creation/graph_theory/global/calculate_assortativity.py --input_path {input[0]} --out_path {output[0]} --min_density {params.min_density} --max_density {params.max_density} --density_step {params.density_step} --labels_path {input[1]} --subid {wildcards.subid} --sidecar_path {output[1]}"
 
-# rule calculate_robustness_random:
-#     input:
-#         os.path.join(outdir, "derivatives", "static", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-rawFC_relmat.tsv"),
-#         os.path.join(outdir, "intermediaries", "networks", "network_labels.pkl")
-#     params:
-#         workflowdir = workflowdir,
-#         outdir = outdir,
-#         min_density = config["min_density"],
-#         max_density = config["max_density"],
-#         density_step = config["density_step"]
-#     output:
-#         os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-robustnessRandom_relmat.pkl"),
-#         os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-robustnessRandom_relmat.json")
-#     conda:
-#         os.path.join(environmentdir, "environment.yaml")
-#     shell:
-#         "mkdir -p {params.outdir}/derivatives/graph_theory/global/sub-{wildcards.subid} && "
-#         "python {params.workflowdir}/scripts/derivatives_creation/graph_theory/global/calculate_robustness_random.py --input_path {input[0]} --out_path {output[0]} --min_density {params.min_density} --max_density {params.max_density} --density_step {params.density_step} --labels_path {input[1]} --subid {wildcards.subid} --sidecar_path {output[1]}"
+rule calculate_robustness_random:
+    input:
+        os.path.join(outdir, "derivatives", "static", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-rawFC_relmat.tsv"),
+        os.path.join(outdir, "intermediaries", "networks", "network_labels.pkl")
+    params:
+        workflowdir = workflowdir,
+        outdir = outdir,
+        min_density = config["min_density"],
+        max_density = config["max_density"],
+        density_step = config["density_step"]
+    output:
+        os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-robustnessRandom_relmat.pkl"),
+        os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-robustnessRandom_relmat.json")
+    conda:
+        os.path.join(environmentdir, "environment.yaml")
+    shell:
+        "mkdir -p {params.outdir}/derivatives/graph_theory/global/sub-{wildcards.subid} && "
+        "python {params.workflowdir}/scripts/derivatives_creation/graph_theory/global/calculate_robustness_random.py --input_path {input[0]} --out_path {output[0]} --min_density {params.min_density} --max_density {params.max_density} --density_step {params.density_step} --labels_path {input[1]} --subid {wildcards.subid} --sidecar_path {output[1]}"
 
-# rule calculate_robustness_targeted:
-#     input:
-#         os.path.join(outdir, "derivatives", "static", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-rawFC_relmat.tsv"),
-#         os.path.join(outdir, "intermediaries", "networks", "network_labels.pkl")
-#     params:
-#         workflowdir = workflowdir,
-#         outdir = outdir,
-#         min_density = config["min_density"],
-#         max_density = config["max_density"],
-#         density_step = config["density_step"]
-#     output:
-#         os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-robustnessTargeted_relmat.pkl"),
-#         os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-robustnessTargeted_relmat.json")
-#     conda:
-#         os.path.join(environmentdir, "environment.yaml")
-#     shell:
-#         "mkdir -p {params.outdir}/derivatives/graph_theory/global/sub-{wildcards.subid} && "
-#         "python {params.workflowdir}/scripts/derivatives_creation/graph_theory/global/calculate_robustness_targeted.py --input_path {input[0]} --out_path {output[0]} --min_density {params.min_density} --max_density {params.max_density} --density_step {params.density_step} --labels_path {input[1]} --subid {wildcards.subid} --sidecar_path {output[1]}"
+rule calculate_robustness_targeted:
+    input:
+        os.path.join(outdir, "derivatives", "static", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-rawFC_relmat.tsv"),
+        os.path.join(outdir, "intermediaries", "networks", "network_labels.pkl")
+    params:
+        workflowdir = workflowdir,
+        outdir = outdir,
+        min_density = config["min_density"],
+        max_density = config["max_density"],
+        density_step = config["density_step"]
+    output:
+        os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-robustnessTargeted_relmat.pkl"),
+        os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-robustnessTargeted_relmat.json")
+    conda:
+        os.path.join(environmentdir, "environment.yaml")
+    shell:
+        "mkdir -p {params.outdir}/derivatives/graph_theory/global/sub-{wildcards.subid} && "
+        "python {params.workflowdir}/scripts/derivatives_creation/graph_theory/global/calculate_robustness_targeted.py --input_path {input[0]} --out_path {output[0]} --min_density {params.min_density} --max_density {params.max_density} --density_step {params.density_step} --labels_path {input[1]} --subid {wildcards.subid} --sidecar_path {output[1]}"
 
-# rule calculate_modularity:
-#     input:
-#         os.path.join(outdir, "derivatives", "static", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-rawFC_relmat.tsv"),
-#         os.path.join(outdir, "intermediaries", "networks", "partition.pkl"),
-#         os.path.join(outdir, "intermediaries", "networks", "to_delete_partition.pkl"),
-#         os.path.join(outdir, "intermediaries", "networks", "partition_labels.pkl"),
-#     params:
-#         workflowdir = workflowdir,
-#         outdir = outdir,
-#         min_density = config["min_density"],
-#         max_density = config["max_density"],
-#         density_step = config["density_step"],
-#         networkdir = os.path.join(outdir, "intermediaries", "networks")
-#     output:
-#         os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-modularity_relmat.pkl"),
-#         os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-modularity_relmat.json")
-#     conda:
-#         os.path.join(environmentdir, "environment.yaml")
-#     shell:
-#         "mkdir -p {params.outdir}/derivatives/graph_theory/global/sub-{wildcards.subid} && "
-#         "python {params.workflowdir}/scripts/derivatives_creation/graph_theory/global/calculate_modularity.py --input_path {input[0]} --out_path {output[0]} --min_density {params.min_density} --max_density {params.max_density} --density_step {params.density_step} --network_dir {params.networkdir} --subid {wildcards.subid} --sidecar_path {output[1]}"
+rule calculate_modularity:
+    input:
+        os.path.join(outdir, "derivatives", "static", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-rawFC_relmat.tsv"),
+        os.path.join(outdir, "intermediaries", "networks", "partition.pkl"),
+        os.path.join(outdir, "intermediaries", "networks", "to_delete_partition.pkl"),
+        os.path.join(outdir, "intermediaries", "networks", "partition_labels.pkl"),
+    params:
+        workflowdir = workflowdir,
+        outdir = outdir,
+        min_density = config["min_density"],
+        max_density = config["max_density"],
+        density_step = config["density_step"],
+        networkdir = os.path.join(outdir, "intermediaries", "networks")
+    output:
+        os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-modularity_relmat.pkl"),
+        os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-modularity_relmat.json")
+    conda:
+        os.path.join(environmentdir, "environment.yaml")
+    shell:
+        "mkdir -p {params.outdir}/derivatives/graph_theory/global/sub-{wildcards.subid} && "
+        "python {params.workflowdir}/scripts/derivatives_creation/graph_theory/global/calculate_modularity.py --input_path {input[0]} --out_path {output[0]} --min_density {params.min_density} --max_density {params.max_density} --density_step {params.density_step} --network_dir {params.networkdir} --subid {wildcards.subid} --sidecar_path {output[1]}"
 
-# rule aggregate_global_metrics:
-#     input:
-#         expand([os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-avgClustering_relmat.pkl"),
-#         os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-globalEfficiency_relmat.pkl"),
-#         os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-assortativity_relmat.pkl"),
-#         os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-robustnessRandom_relmat.pkl"),
-#         os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-robustnessTargeted_relmat.pkl"),
-#         os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-modularity_relmat.pkl")], subid=subids),
-#         demo=os.path.join(outdir, "intermediaries", "demo_data.csv")
-#     params:
-#         workflowdir = workflowdir,
-#         outdir = outdir,
-#         subids=subids
-#     output:
-#         os.path.join(outdir, "derivatives", "graph_theory", "global", "task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-globalMetrics_relmat.tsv"),
-#         os.path.join(outdir, "derivatives", "graph_theory", "global", "task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-globalMetrics_relmat.json")
-#     conda:
-#         os.path.join(environmentdir, "environment.yaml")
-#     shell:
-#         "python {params.workflowdir}/scripts/derivatives_creation/graph_theory/global/aggregate_global_metrics.py --global_metrics_dir {params.outdir}/derivatives/graph_theory/global/ --demo_data_path {input.demo} --out_path {output[0]} --sidecar_path {output[1]} --subids {params.subids}"
+rule aggregate_global_metrics:
+    input:
+        expand([os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-avgClustering_relmat.pkl"),
+        os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-globalEfficiency_relmat.pkl"),
+        os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-assortativity_relmat.pkl"),
+        os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-robustnessRandom_relmat.pkl"),
+        os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-robustnessTargeted_relmat.pkl"),
+        os.path.join(outdir, "derivatives", "graph_theory", "global", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-modularity_relmat.pkl")], subid=subids),
+        demo=os.path.join(outdir, "intermediaries", "demo_data.csv")
+    params:
+        workflowdir = workflowdir,
+        outdir = outdir,
+        subids=subids
+    output:
+        os.path.join(outdir, "derivatives", "graph_theory", "global", "task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-globalMetrics_relmat.tsv"),
+        os.path.join(outdir, "derivatives", "graph_theory", "global", "task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-globalMetrics_relmat.json")
+    conda:
+        os.path.join(environmentdir, "environment.yaml")
+    shell:
+        "python {params.workflowdir}/scripts/derivatives_creation/graph_theory/global/aggregate_global_metrics.py --global_metrics_dir {params.outdir}/derivatives/graph_theory/global/ --demo_data_path {input.demo} --out_path {output[0]} --sidecar_path {output[1]} --subids {params.subids}"
 
-# """ Local metrics """
+""" Local metrics """
 
-# rule calculate_betweenness_centrality:
-#     input:
-#         os.path.join(outdir, "derivatives", "static", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-rawFC_relmat.tsv"),
-#         os.path.join(outdir, "intermediaries", "networks", "network_labels.pkl")
-#     params:
-#         workflowdir = workflowdir,
-#         outdir = outdir,
-#         min_density = config["min_density"],
-#         max_density = config["max_density"],
-#         density_step = config["density_step"]
-#     output:
-#         os.path.join(outdir, "derivatives", "graph_theory", "local", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-betweennessCentrality_relmat.pkl"),
-#         os.path.join(outdir, "derivatives", "graph_theory", "local", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-betweennessCentrality_relmat.json")
-#     conda:
-#         os.path.join(environmentdir, "environment.yaml")
-#     shell:
-#         "mkdir -p {params.outdir}/derivatives/graph_theory/local/sub-{wildcards.subid} && "
-#         "python {params.workflowdir}/scripts/derivatives_creation/graph_theory/local/calculate_betweenness_centrality.py --fc_path {input[0]} --out_path {output[0]} --sidecar_path {output[1]} --subid {wildcards.subid} --min_density {params.min_density} --max_density {params.max_density} --density_step {params.density_step} --labels_path {input[1]}"
+rule calculate_betweenness_centrality:
+    input:
+        os.path.join(outdir, "derivatives", "static", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-rawFC_relmat.tsv"),
+        os.path.join(outdir, "intermediaries", "networks", "network_labels.pkl")
+    params:
+        workflowdir = workflowdir,
+        outdir = outdir,
+        min_density = config["min_density"],
+        max_density = config["max_density"],
+        density_step = config["density_step"]
+    output:
+        os.path.join(outdir, "derivatives", "graph_theory", "local", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-betweennessCentrality_relmat.pkl"),
+        os.path.join(outdir, "derivatives", "graph_theory", "local", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-betweennessCentrality_relmat.json")
+    conda:
+        os.path.join(environmentdir, "environment.yaml")
+    shell:
+        "mkdir -p {params.outdir}/derivatives/graph_theory/local/sub-{wildcards.subid} && "
+        "python {params.workflowdir}/scripts/derivatives_creation/graph_theory/local/calculate_betweenness_centrality.py --fc_path {input[0]} --out_path {output[0]} --sidecar_path {output[1]} --subid {wildcards.subid} --min_density {params.min_density} --max_density {params.max_density} --density_step {params.density_step} --labels_path {input[1]}"
 
-# rule calculate_degree_centrality:
-#     input:
-#         os.path.join(outdir, "derivatives", "static", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-rawFC_relmat.tsv"),
-#         os.path.join(outdir, "intermediaries", "networks", "network_labels.pkl")
-#     params:
-#         workflowdir = workflowdir,
-#         outdir = outdir,
-#         min_density = config["min_density"],
-#         max_density = config["max_density"],
-#         density_step = config["density_step"]
-#     output:
-#         os.path.join(outdir, "derivatives", "graph_theory", "local", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-degreeCentrality_relmat.pkl"),
-#         os.path.join(outdir, "derivatives", "graph_theory", "local", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-degreeCentrality_relmat.json")
-#     conda:
-#         os.path.join(environmentdir, "environment.yaml")
-#     shell:
-#         "mkdir -p {params.outdir}/derivatives/graph_theory/local/sub-{wildcards.subid} && "
-#         "python {params.workflowdir}/scripts/derivatives_creation/graph_theory/local/calculate_degree_centrality.py --fc_path {input[0]} --out_path {output[0]} --sidecar_path {output[1]} --subid {wildcards.subid} --min_density {params.min_density} --max_density {params.max_density} --density_step {params.density_step} --labels_path {input[1]}"
+rule calculate_degree_centrality:
+    input:
+        os.path.join(outdir, "derivatives", "static", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-rawFC_relmat.tsv"),
+        os.path.join(outdir, "intermediaries", "networks", "network_labels.pkl")
+    params:
+        workflowdir = workflowdir,
+        outdir = outdir,
+        min_density = config["min_density"],
+        max_density = config["max_density"],
+        density_step = config["density_step"]
+    output:
+        os.path.join(outdir, "derivatives", "graph_theory", "local", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-degreeCentrality_relmat.pkl"),
+        os.path.join(outdir, "derivatives", "graph_theory", "local", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-degreeCentrality_relmat.json")
+    conda:
+        os.path.join(environmentdir, "environment.yaml")
+    shell:
+        "mkdir -p {params.outdir}/derivatives/graph_theory/local/sub-{wildcards.subid} && "
+        "python {params.workflowdir}/scripts/derivatives_creation/graph_theory/local/calculate_degree_centrality.py --fc_path {input[0]} --out_path {output[0]} --sidecar_path {output[1]} --subid {wildcards.subid} --min_density {params.min_density} --max_density {params.max_density} --density_step {params.density_step} --labels_path {input[1]}"
 
-# rule calculate_clustering_coefficient:
-#     input:
-#         os.path.join(outdir, "derivatives", "static", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-rawFC_relmat.tsv"),
-#         os.path.join(outdir, "intermediaries", "networks", "network_labels.pkl")
-#     params:
-#         workflowdir = workflowdir,
-#         outdir = outdir,
-#         min_density = config["min_density"],
-#         max_density = config["max_density"],
-#         density_step = config["density_step"]
-#     output:
-#         os.path.join(outdir, "derivatives", "graph_theory", "local", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-clusteringCoefficient_relmat.pkl"),
-#         os.path.join(outdir, "derivatives", "graph_theory", "local", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-clusteringCoefficient_relmat.json")
-#     conda:
-#         os.path.join(environmentdir, "environment.yaml")
-#     shell:
-#         "mkdir -p {params.outdir}/derivatives/graph_theory/local/sub-{wildcards.subid} && "
-#         "python {params.workflowdir}/scripts/derivatives_creation/graph_theory/local/calculate_clustering_coefficient.py --fc_path {input[0]} --out_path {output[0]} --sidecar_path {output[1]} --subid {wildcards.subid} --min_density {params.min_density} --max_density {params.max_density} --density_step {params.density_step} --labels_path {input[1]}"
+rule calculate_clustering_coefficient:
+    input:
+        os.path.join(outdir, "derivatives", "static", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-rawFC_relmat.tsv"),
+        os.path.join(outdir, "intermediaries", "networks", "network_labels.pkl")
+    params:
+        workflowdir = workflowdir,
+        outdir = outdir,
+        min_density = config["min_density"],
+        max_density = config["max_density"],
+        density_step = config["density_step"]
+    output:
+        os.path.join(outdir, "derivatives", "graph_theory", "local", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-clusteringCoefficient_relmat.pkl"),
+        os.path.join(outdir, "derivatives", "graph_theory", "local", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-clusteringCoefficient_relmat.json")
+    conda:
+        os.path.join(environmentdir, "environment.yaml")
+    shell:
+        "mkdir -p {params.outdir}/derivatives/graph_theory/local/sub-{wildcards.subid} && "
+        "python {params.workflowdir}/scripts/derivatives_creation/graph_theory/local/calculate_clustering_coefficient.py --fc_path {input[0]} --out_path {output[0]} --sidecar_path {output[1]} --subid {wildcards.subid} --min_density {params.min_density} --max_density {params.max_density} --density_step {params.density_step} --labels_path {input[1]}"
 
-# rule calculate_avg_shortest_path_length:
-#     input:
-#         os.path.join(outdir, "derivatives", "static", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-rawFC_relmat.tsv"),
-#         os.path.join(outdir, "intermediaries", "networks", "network_labels.pkl")
-#     params:
-#         workflowdir = workflowdir,
-#         outdir = outdir,
-#         min_density = config["min_density"],
-#         max_density = config["max_density"],
-#         density_step = config["density_step"]
-#     output:
-#         os.path.join(outdir, "derivatives", "graph_theory", "local", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-avgShortestPathLength_relmat.pkl"),
-#         os.path.join(outdir, "derivatives", "graph_theory", "local", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-avgShortestPathLength_relmat.json")
-#     conda:
-#         os.path.join(environmentdir, "environment.yaml")
-#     shell:
-#         "mkdir -p {params.outdir}/derivatives/graph_theory/local/sub-{wildcards.subid} && "
-#         "python {params.workflowdir}/scripts/derivatives_creation/graph_theory/local/calculate_avg_shortest_path_length.py --fc_path {input[0]} --out_path {output[0]} --sidecar_path {output[1]} --subid {wildcards.subid} --min_density {params.min_density} --max_density {params.max_density} --density_step {params.density_step} --labels_path {input[1]}"
+rule calculate_avg_shortest_path_length:
+    input:
+        os.path.join(outdir, "derivatives", "static", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-rawFC_relmat.tsv"),
+        os.path.join(outdir, "intermediaries", "networks", "network_labels.pkl")
+    params:
+        workflowdir = workflowdir,
+        outdir = outdir,
+        min_density = config["min_density"],
+        max_density = config["max_density"],
+        density_step = config["density_step"]
+    output:
+        os.path.join(outdir, "derivatives", "graph_theory", "local", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-avgShortestPathLength_relmat.pkl"),
+        os.path.join(outdir, "derivatives", "graph_theory", "local", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-avgShortestPathLength_relmat.json")
+    conda:
+        os.path.join(environmentdir, "environment.yaml")
+    shell:
+        "mkdir -p {params.outdir}/derivatives/graph_theory/local/sub-{wildcards.subid} && "
+        "python {params.workflowdir}/scripts/derivatives_creation/graph_theory/local/calculate_avg_shortest_path_length.py --fc_path {input[0]} --out_path {output[0]} --sidecar_path {output[1]} --subid {wildcards.subid} --min_density {params.min_density} --max_density {params.max_density} --density_step {params.density_step} --labels_path {input[1]}"
 
-# rule calculate_participation_coeff:
-#     input:
-#         os.path.join(outdir, "derivatives", "static", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-rawFC_relmat.tsv"),
-#         os.path.join(outdir, "intermediaries", "networks", "partition.pkl"),
-#         os.path.join(outdir, "intermediaries", "networks", "partition_labels.pkl"),
-#         os.path.join(outdir, "intermediaries", "networks", "to_delete_partition.pkl")
-#     params:
-#         workflowdir = workflowdir,
-#         outdir = outdir,
-#         min_density = config["min_density"],
-#         max_density = config["max_density"],
-#         density_step = config["density_step"]
-#     output:
-#         os.path.join(outdir, "derivatives", "graph_theory", "local", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-participationCoeff_relmat.pkl"),
-#         os.path.join(outdir, "derivatives", "graph_theory", "local", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-participationCoeff_relmat.json")
-#     conda:
-#         os.path.join(environmentdir, "environment.yaml")
-#     shell:
-#         "mkdir -p {params.outdir}/derivatives/graph_theory/local/sub-{wildcards.subid} && "
-#         "python {params.workflowdir}/scripts/derivatives_creation/graph_theory/local/calculate_participation_coeff.py --fc_path {input[0]} --out_path {output[0]} --sidecar_path {output[1]} --subid {wildcards.subid} --min_density {params.min_density} --max_density {params.max_density} --density_step {params.density_step} --networks_dir {params.outdir}/intermediaries/networks"
+rule calculate_participation_coeff:
+    input:
+        os.path.join(outdir, "derivatives", "static", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-rawFC_relmat.tsv"),
+        os.path.join(outdir, "intermediaries", "networks", "partition.pkl"),
+        os.path.join(outdir, "intermediaries", "networks", "partition_labels.pkl"),
+        os.path.join(outdir, "intermediaries", "networks", "to_delete_partition.pkl")
+    params:
+        workflowdir = workflowdir,
+        outdir = outdir,
+        min_density = config["min_density"],
+        max_density = config["max_density"],
+        density_step = config["density_step"]
+    output:
+        os.path.join(outdir, "derivatives", "graph_theory", "local", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-participationCoeff_relmat.pkl"),
+        os.path.join(outdir, "derivatives", "graph_theory", "local", "sub-{subid}", "sub-{subid}_task-rest_space-fsLR_seg-DesikanKilliany_den-91k_desc-participationCoeff_relmat.json")
+    conda:
+        os.path.join(environmentdir, "environment.yaml")
+    shell:
+        "mkdir -p {params.outdir}/derivatives/graph_theory/local/sub-{wildcards.subid} && "
+        "python {params.workflowdir}/scripts/derivatives_creation/graph_theory/local/calculate_participation_coeff.py --fc_path {input[0]} --out_path {output[0]} --sidecar_path {output[1]} --subid {wildcards.subid} --min_density {params.min_density} --max_density {params.max_density} --density_step {params.density_step} --networks_dir {params.outdir}/intermediaries/networks"
