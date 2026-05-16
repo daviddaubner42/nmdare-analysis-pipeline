@@ -634,7 +634,6 @@ rule xcp_d:
         "--participant-label {wildcards.subid} "
         "--mode linc "
         "--despike "
-        "--output-spaces fsLR "
         "--nuisance-regressors acompcor "
         "--datasets DesikanKilliany={params.atlas_dir} "
         "--atlases DesikanKilliany "
